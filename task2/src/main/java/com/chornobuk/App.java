@@ -1,5 +1,6 @@
 package com.chornobuk;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
@@ -18,19 +19,21 @@ public class App {
         // System.out.println(t.getTypeName());
         try {
             Field f = App.class.getDeclaredField("name");
-            System.out.println(Arrays.toString(f.getAnnotations()));
+            // System.out.println(Arrays.toString(f.getAnnotations()));
             if(f.isAnnotationPresent(Property.class)) {
                 Property property = f.getAnnotation(Property.class);
-                System.out.println(property.format());
-                System.out.println(property.name());
+                // System.out.println(property.format());
+                // System.out.println(property.name());
             }
-        } catch (NoSuchFieldException e) {
+            Object obj = App.class.getDeclaredConstructor().newInstance();
+            Field n = App.class.getDeclaredField("name");
+            n.set(obj, "test");
+            App app = (App) obj;
+            System.out.println(app.name);
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        } 
         
         // todo:
         // []1. create an annotation

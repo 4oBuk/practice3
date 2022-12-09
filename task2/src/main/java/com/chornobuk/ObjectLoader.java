@@ -18,14 +18,26 @@ public class ObjectLoader {
     public static <T> T loadFromProperties(Class<T> cls, Path propertiesPath) {
         try {
             Properties properties = loadPropertiesFromFile(propertiesPath);
-            Map<String, Object> fieldValueMap = new HashMap<>();
-            Field[] fields = cls.getFields();
+            Map<Field, Object> fieldValueMap = new HashMap<>();
+            Field[] fields = cls.getDeclaredFields();
+            T object = cls.getDeclaredConstructor(null).newInstance(null);
             for (Field field : fields) {
+                field.setAccessible(true);
                 String property = getPropertyValue(field, properties);
-                fieldValueMap.put(field.getName(), parseProperty(field, property));
+                field.set(object, parseProperty(field, property));
             }
-            System.out.println(fieldValueMap);
+            return object;
+            // cls.getConstructor(null);
+            // todo: create an object and set the read values
+            // I have to use default constructor (without parameters) of the object
+            // if object doesn't have such constructor
+            // load won't be possible
+            // get all setters of the class
+            // and use them to set necessary value
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch(Exception e) {//todo:replace with particular exceptions 
             e.printStackTrace();
         }
         return null;
@@ -33,15 +45,15 @@ public class ObjectLoader {
 
     // gets String value of the property, parses it and returns the result
     private static Object parseProperty(Field field, String value) {
-        if (field.getClass().equals(String.class)) {
+        if (field.getType().equals(String.class)) {
             return value;
-        } else if (field.getClass().equals(Integer.class) || field.getClass().equals(int.class)) {
+        } else if (field.getType().equals(Integer.class) || field.getType().equals(int.class)) {
             try {
                 return Integer.parseInt(value);
             } catch (NumberFormatException e) {
                 System.out.println(value + "cannot be cast to Integer");
             }
-        } else if (field.getClass().equals(Instant.class)) {
+        } else if (field.getType().equals(Instant.class)) {
             try {
                 if (field.isAnnotationPresent(Property.class)) {
                     Property property = field.getAnnotation(Property.class);
@@ -58,7 +70,7 @@ public class ObjectLoader {
                 e.printStackTrace();
             }
         } else {
-            throw new IllegalArgumentException(field.getClass().getTypeName() + " is not supported");
+            throw new IllegalArgumentException(field.getType().getTypeName() + " is not supported");
         }
         // todo: refactor it
         return null;
