@@ -4,41 +4,46 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 public class ObjectLoader {
-    public static <T> T loadFromProperties(Class<T> cls, Path propertiesPath) {
-        try {
-            Properties properties = loadPropertiesFromFile(propertiesPath);
-            Map<Field, Object> fieldValueMap = new HashMap<>();
-            Field[] fields = cls.getDeclaredFields();
-            T object = cls.getDeclaredConstructor(null).newInstance(null);
-            for (Field field : fields) {
-                field.setAccessible(true);
-                String property = getPropertyValue(field, properties);
-                field.set(object, parseProperty(field, property));
-            }
-            return object;
-            // cls.getConstructor(null);
-            // todo: create an object and set the read values
-            // I have to use default constructor (without parameters) of the object
-            // if object doesn't have such constructor
-            // load won't be possible
-            // get all setters of the class
-            // and use them to set necessary value
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {// todo:replace with particular exceptions
-            e.printStackTrace();
+    public static <T> T loadFromProperties(Class<T> cls, Path propertiesPath) throws Exception {
+        // try {
+        Properties properties = loadPropertiesFromFile(propertiesPath);
+        Map<Field, Object> fieldValueMap = new HashMap<>();
+        Field[] fields = cls.getDeclaredFields();
+        T object = cls.getDeclaredConstructor(null).newInstance(null);
+        for (Field field : fields) {
+            field.setAccessible(true);
+            String property = getPropertyValue(field, properties);
+            field.set(object, parseProperty(field, property));
         }
-        return null;
+        return object;
+        // } catch (IOException e) {
+        // e.printStackTrace();
+        // } catch (InstantiationException e) {
+        // e.printStackTrace();
+        // } catch (IllegalAccessException e) {
+        // e.printStackTrace();
+        // } catch (IllegalArgumentException e) {
+        // e.printStackTrace();
+        // } catch (InvocationTargetException e) {
+        // e.printStackTrace();
+        // } catch (NoSuchMethodException e) {
+        // e.printStackTrace();
+        // } catch (SecurityException e) {
+        // e.printStackTrace();
+        // }
+        // return null;
     }
 
     // gets String value of the property, parses it and returns the result
@@ -46,28 +51,22 @@ public class ObjectLoader {
         if (field.getType().equals(String.class)) {
             return value;
         } else if (field.getType().equals(Integer.class) || field.getType().equals(int.class)) {
-            try {
-                return Integer.parseInt(value);
-            } catch (NumberFormatException e) {
-                System.out.println(value + "cannot be cast to Integer");
-            }
-        } else if (field.getType().equals(Instant.class)) {
-            try {
-                if (field.isAnnotationPresent(Property.class)) {
-                    Property property = field.getAnnotation(Property.class);
-                    if (!property.name().isEmpty()) {
-                        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(property.name())
-                                .withZone(ZoneId.systemDefault());
-                        Instant instant = Instant.from(dateTimeFormatter.parse(value));
-                        return instant;
-                    }
-                } else {
-                    // todo: here should be instant formatter
-                    return DateTimeFormatter.ISO_DATE_TIME.parse(value);
-                }
 
-            } catch (DateTimeParseException e) {
-                e.printStackTrace();
+            return Integer.parseInt(value);
+        } else if (field.getType().equals(Instant.class)) {
+            if (field.isAnnotationPresent(Property.class)) {
+                Property property = field.getAnnotation(Property.class);
+                if (!property.format().isEmpty()) {
+                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(property.format())
+                            .withZone(ZoneId.systemDefault());
+                    Instant instant = Instant.from(dateTimeFormatter.parse(value));
+                    return instant;
+                }
+            } else {
+                TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_INSTANT
+                        .withZone(ZoneId.systemDefault())
+                        .parse(value);
+                return Instant.from(temporalAccessor);
             }
         } else {
             throw new IllegalArgumentException(field.getType().getTypeName() + " is not supported");

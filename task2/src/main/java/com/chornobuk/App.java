@@ -1,40 +1,16 @@
 package com.chornobuk;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.util.Arrays;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 
 public class App {
-
-    @Property(name = "firstname")
-    private static String name = "sfdsf";
-    
     public static void main(String[] args) {
-        // Method[] methods = String.class.getMethods();
-        // Type t = String.class;
-        // Field[] fields = Test.class.getDeclaredFields();
-        // System.out.println(String.class.getTypeName());
-        // System.out.println(int.class.getTypeName());
-        // System.out.println(Integer.class.getTypeName());
-        // System.out.println(t.getTypeName());
-        try {
-            Field f = App.class.getDeclaredField("name");
-            // System.out.println(Arrays.toString(f.getAnnotations()));
-            if(f.isAnnotationPresent(Property.class)) {
-                Property property = f.getAnnotation(Property.class);
-                // System.out.println(property.format());
-                // System.out.println(property.name());
-            }
-            Object obj = App.class.getDeclaredConstructor().newInstance();
-            Field n = App.class.getDeclaredField("name");
-            n.set(obj, "test");
-            App app = (App) obj;
-            System.out.println(app.name);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } 
-        
+        String s = "10.12.2022 10:10";
+        TemporalAccessor dt = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").withZone(ZoneId.systemDefault()).parse(s);
+        System.out.println(Instant.from(dt));
         // todo:
         // [x]1. create an annotation
         // [x]2. create class for reading properties file (read in map)
