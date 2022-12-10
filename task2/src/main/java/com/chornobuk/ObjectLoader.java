@@ -58,13 +58,18 @@ public class ObjectLoader {
                 Property property = field.getAnnotation(Property.class);
                 if (!property.format().isEmpty()) {
                     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(property.format())
-                            .withZone(ZoneId.systemDefault());
+                            .withZone(ZoneId.of("UTC"));
                     Instant instant = Instant.from(dateTimeFormatter.parse(value));
                     return instant;
+                } else {
+                    TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_INSTANT
+                            .withZone(ZoneId.of("UTC"))
+                            .parse(value);
+                    return Instant.from(temporalAccessor);
                 }
             } else {
                 TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_INSTANT
-                        .withZone(ZoneId.systemDefault())
+                        .withZone(ZoneId.of("UTC"))
                         .parse(value);
                 return Instant.from(temporalAccessor);
             }
@@ -72,7 +77,6 @@ public class ObjectLoader {
             throw new IllegalArgumentException(field.getType().getTypeName() + " is not supported");
         }
         // todo: refactor it
-        return null;
     }
 
     // get property value by the name of the field or the name of Property
