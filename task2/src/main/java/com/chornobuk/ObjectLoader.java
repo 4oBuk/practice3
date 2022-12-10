@@ -1,6 +1,5 @@
 package com.chornobuk;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,8 +35,7 @@ public class ObjectLoader {
             // and use them to set necessary value
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        catch(Exception e) {//todo:replace with particular exceptions 
+        } catch (Exception e) {// todo:replace with particular exceptions
             e.printStackTrace();
         }
         return null;
@@ -63,7 +61,9 @@ public class ObjectLoader {
                         Instant instant = Instant.from(dateTimeFormatter.parse(value));
                         return instant;
                     }
-                    return DateTimeFormatter.ISO_INSTANT.parse(value);
+                } else {
+                    // todo: here should be instant formatter
+                    return DateTimeFormatter.ISO_DATE_TIME.parse(value);
                 }
 
             } catch (DateTimeParseException e) {
