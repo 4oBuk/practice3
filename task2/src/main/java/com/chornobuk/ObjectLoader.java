@@ -15,6 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import com.chornobuk.parsers.Parser;
+import com.chornobuk.parsers.ParsersFactory;
+
 public class ObjectLoader {
     public static <T> T loadFromProperties(Class<T> cls, Path propertiesPath) throws Exception {
         // try {
@@ -48,35 +51,13 @@ public class ObjectLoader {
 
     // gets String value of the property, parses it and returns the result
     private static Object parseProperty(Field field, String value) {
-        if (field.getType().equals(String.class)) {
-            return value;
-        } else if (field.getType().equals(Integer.class) || field.getType().equals(int.class)) {
-
-            return Integer.parseInt(value);
-        } else if (field.getType().equals(Instant.class)) {
-            if (field.isAnnotationPresent(Property.class)) {
-                Property property = field.getAnnotation(Property.class);
-                if (!property.format().isEmpty()) {
-                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(property.format())
-                            .withZone(ZoneId.of("UTC"));
-                    Instant instant = Instant.from(dateTimeFormatter.parse(value));
-                    return instant;
-                } else {
-                    TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_INSTANT
-                            .withZone(ZoneId.of("UTC"))
-                            .parse(value);
-                    return Instant.from(temporalAccessor);
-                }
-            } else {
-                TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_INSTANT
-                        .withZone(ZoneId.of("UTC"))
-                        .parse(value);
-                return Instant.from(temporalAccessor);
-            }
+        ParsersFactory parsersFactory = ParsersFactory.getInstance();
+        Parser parser = parsersFactory.get(field.getType());
+        if (parser != null) {
+            return parser.parse(field, value);
         } else {
             throw new IllegalArgumentException(field.getType().getTypeName() + " is not supported");
         }
-        // todo: refactor it
     }
 
     // get property value by the name of the field or the name of Property
