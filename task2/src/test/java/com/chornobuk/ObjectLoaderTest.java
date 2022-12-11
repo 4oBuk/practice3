@@ -122,14 +122,14 @@ public class ObjectLoaderTest {
 
     @Test
     public void classWithUnsupportedFields() throws Exception {
-        Path path = getPathForFile("infoWithUnsupported.properties");
+        Path path = getPathForFile("info.properties");
         assertThrows(IllegalArgumentException.class,
                 () -> ObjectLoader.loadFromProperties(InfoWithUnsupported.class, path));
     }
 
     @Test
     public void classHasOnlyUnsupportedFields() throws Exception {
-        Path path = getPathForFile("infoWithUnsupported.properties");
+        Path path = getPathForFile("info.properties");
         assertThrows(IllegalArgumentException.class,
                 () -> ObjectLoader.loadFromProperties(OnlyUnsupported.class, path));
     }
