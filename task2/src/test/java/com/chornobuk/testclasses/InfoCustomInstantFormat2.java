@@ -6,33 +6,9 @@ import java.util.Objects;
 import com.chornobuk.Property;
 
 public class InfoCustomInstantFormat2 {
-    private String value;
-
-    @Property(name = "lastname")
-    private String surname;
-
-    private int age;
-
-    private Integer height;
 
     @Property(format = "dd/MM/yyyy HH:mm:ss")
     private Instant instant;
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public Integer getHeight() {
-        return height;
-    }
-
-    public void setHeight(Integer height) {
-        this.height = height;
-    }
 
     public Instant getInstant() {
         return instant;
@@ -42,25 +18,9 @@ public class InfoCustomInstantFormat2 {
         this.instant = instant;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-    
     @Override
     public int hashCode() {
-        return Objects.hash(value, surname, age, height, instant);
+        return Objects.hash(instant);
     }
 
     @Override
@@ -70,7 +30,6 @@ public class InfoCustomInstantFormat2 {
         }
         if (!(obj instanceof InfoCustomInstantFormat2 info))
             return false;
-        return value.equals(info.value) && surname.equals(info.surname) && age == info.age
-                && height.equals(info.height) && instant.equals(info.instant);
+        return instant.equals(info.instant);
     }
 }

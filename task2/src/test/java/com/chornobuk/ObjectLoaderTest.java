@@ -77,10 +77,6 @@ public class ObjectLoaderTest {
     public void customFormat1() throws Exception {
         InfoCustomInstantFormat1 expected = new InfoCustomInstantFormat1();
         LocalDateTime dateTime = LocalDateTime.of(2022, 12, 10, 10, 10);
-        expected.setAge(12);
-        expected.setHeight(150);
-        expected.setSurname("Testovchuk");
-        expected.setValue("myValue");
         expected.setInstant(Instant.ofEpochSecond(dateTime.toEpochSecond(ZoneOffset.UTC)));
         Path path = getPathForFile("customFormat1.properties");
         InfoCustomInstantFormat1 parsed = ObjectLoader.loadFromProperties(InfoCustomInstantFormat1.class, path);
@@ -91,10 +87,6 @@ public class ObjectLoaderTest {
     public void customFormat2() throws Exception {
         InfoCustomInstantFormat2 expected = new InfoCustomInstantFormat2();
         LocalDateTime dateTime = LocalDateTime.of(2022, 12, 10, 10, 10, 10);
-        expected.setAge(12);
-        expected.setHeight(150);
-        expected.setSurname("Testovchuk");
-        expected.setValue("myValue");
         expected.setInstant(Instant.ofEpochSecond(dateTime.toEpochSecond(ZoneOffset.UTC)));
         Path path = getPathForFile("customFormat2.properties");
         InfoCustomInstantFormat2 parsed = ObjectLoader.loadFromProperties(InfoCustomInstantFormat2.class, path);
